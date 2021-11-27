@@ -17,6 +17,9 @@ func main() {
 	router.HandleFunc("/products", server.CreateProduct).Methods("POST")
 	//create material route
 	router.HandleFunc("/materials", server.CreateRawMaterial).Methods("POST")
+	//create commodity route
+	router.HandleFunc("/commodities", server.CreateCommodity).Methods("POST")
+
 	//starting server
 	fmt.Println("Escutando na porta 8080")
 	log.Fatal(http.ListenAndServe(":8080", router))

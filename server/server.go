@@ -84,3 +84,31 @@ func CreateRawMaterial(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Fprintf(w, "New raw material has been successfully created")
 }
+
+//create new commodity
+func CreateCommodity(w http.ResponseWriter, r *http.Request) {
+	var commodity Commodity
+	reqBody, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		fmt.Fprintf(w, "Kindly enter data with the product id and raw materials id only in order to update")
+		return
+	}
+	json.Unmarshal(reqBody, &commodity)
+	//fmt.Println(commodity)
+	db, err := database.DbConnect()
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer db.Close()
+
+	//inserting new commodity
+	insert, err := db.Query("INSERT INTO commodities(id_product, id_raw_material, quantity) VALUES(?, ?, ?)", commodity.Id_product, commodity.Id_raw_material, commodity.Quantity)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer insert.Close()
+	w.WriteHeader(http.
+		StatusCreated) // 201
+
+	fmt.Fprintf(w, "New commodity has been successfully created")
+}
