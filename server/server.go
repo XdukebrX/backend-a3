@@ -8,11 +8,13 @@ import (
 	"net/http"
 )
 
+const JSON = "application/json"
+
 //struct protuct id name value
 type Product struct {
-	Id    uint32 `json:"id"`
-	Name  string `json:"name"`
-	Value uint32 `json:"value"`
+	Id    uint32  `json:"id"`
+	Name  string  `json:"name"`
+	Value float64 `json:"value"`
 }
 
 //struct raw material id name stock
@@ -94,7 +96,7 @@ func CreateCommodity(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	json.Unmarshal(reqBody, &commodity)
-	//fmt.Println(commodity)
+
 	db, err := database.DbConnect()
 	if err != nil {
 		fmt.Println(err)
@@ -111,4 +113,89 @@ func CreateCommodity(w http.ResponseWriter, r *http.Request) {
 		StatusCreated) // 201
 
 	fmt.Fprintf(w, "New commodity has been successfully created")
+
+}
+
+//get all products
+func GetAllProducts(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", JSON)
+	db, err := database.DbConnect()
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer db.Close()
+
+	//getting all products
+	rows, err := db.Query("SELECT * FROM products")
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer rows.Close()
+
+	var products []Product
+	for rows.Next() {
+		var product Product
+		err := rows.Scan(&product.Id, &product.Name, &product.Value)
+		if err != nil {
+			fmt.Println(err)
+		}
+		products = append(products, product)
+	}
+	json.NewEncoder(w).Encode(products)
+}
+
+//get all raw materials
+func GetAllRawMaterials(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", JSON)
+	db, err := database.DbConnect()
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer db.Close()
+
+	//getting all raw materials
+	rows, err := db.Query("SELECT * FROM raw_materials")
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer rows.Close()
+
+	var rawMaterials []RawMaterial
+	for rows.Next() {
+		var rawMaterial RawMaterial
+		err := rows.Scan(&rawMaterial.Id, &rawMaterial.Name, &rawMaterial.Stock)
+		if err != nil {
+			fmt.Println(err)
+		}
+		rawMaterials = append(rawMaterials, rawMaterial)
+	}
+	json.NewEncoder(w).Encode(rawMaterials)
+}
+
+//get all commodities
+func GetAllCommodities(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", JSON)
+	db, err := database.DbConnect()
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer db.Close()
+
+	//getting all commodities
+	rows, err := db.Query("SELECT * FROM commodities")
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer rows.Close()
+
+	var commodities []Commodity
+	for rows.Next() {
+		var commodity Commodity
+		err := rows.Scan(&commodity.Id_product, &commodity.Id_raw_material, &commodity.Quantity)
+		if err != nil {
+			fmt.Println(err)
+		}
+		commodities = append(commodities, commodity)
+	}
+	json.NewEncoder(w).Encode(commodities)
 }
