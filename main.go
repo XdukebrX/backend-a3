@@ -16,20 +16,23 @@ func main() {
 	router := mux.NewRouter()
 	//adding new route
 	router.HandleFunc("/products", server.CreateProduct).Methods("POST")
-	//create material route
+	//create material
 	router.HandleFunc("/materials", server.CreateRawMaterial).Methods("POST")
-	//create commodity route
+	//create commodity
 	router.HandleFunc("/commodities", server.CreateCommodity).Methods("POST")
 
-	//get all products route
+	//get all products
 	router.HandleFunc("/listproducts", server.GetAllProducts).Methods("GET")
-	//get all raw materials route
+	//get all raw materials
 	router.HandleFunc("/listmaterials", server.GetAllRawMaterials).Methods("GET")
-	//get all commodities route
+	//get all commodities
 	router.HandleFunc("/listcommodities", server.GetAllCommodities).Methods("GET")
 	//get product by name
 	router.HandleFunc("/listproducts/{name}", server.GetProductByName).Methods("GET")
-
+	//get raw material by name
+	router.HandleFunc("/listmaterials/{name}", server.GetRawMaterialByName).Methods("GET")
+	//get commodity by name
+	//router.HandleFunc("/listcommodities/{name}", server.GetCommodityByName).Methods("GET")
 	//starting server
 	fmt.Println("Listening on port 8080")
 	log.Fatal(http.ListenAndServe(":8080", router))

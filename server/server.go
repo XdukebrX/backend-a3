@@ -213,7 +213,7 @@ func GetProductByName(w http.ResponseWriter, r *http.Request) {
 	}
 	defer db.Close()
 
-	productName = productName + "%"
+	productName = "%" + productName + "%"
 	//getting product by name
 	row := db.QueryRow("SELECT * FROM products WHERE name LIKE  ? ", productName)
 	var product Product
@@ -222,4 +222,26 @@ func GetProductByName(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 	}
 	json.NewEncoder(w).Encode(product)
+}
+
+//get raw material by name via url
+func GetRawMaterialByName(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", JSON)
+	params := mux.Vars(r)
+	rawMaterialName := params["name"]
+	db, err := database.DbConnect()
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer db.Close()
+
+	rawMaterialName = "%" + rawMaterialName + "%"
+	//getting raw material by name
+	row := db.QueryRow("SELECT * FROM raw_materials WHERE name LIKE  ? ", rawMaterialName)
+	var rawMaterial RawMaterial
+	err = row.Scan(&rawMaterial.Id, &rawMaterial.Name, &rawMaterial.Stock)
+	if err != nil {
+		fmt.Println(err)
+	}
+	json.NewEncoder(w).Encode(rawMaterial)
 }
