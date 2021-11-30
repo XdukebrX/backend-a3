@@ -245,3 +245,33 @@ func GetRawMaterialByName(w http.ResponseWriter, r *http.Request) {
 	}
 	json.NewEncoder(w).Encode(rawMaterial)
 }
+
+//get commodity by product id
+func GetCommodityByProductId(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", JSON)
+	params := mux.Vars(r)
+	productId := params["id"]
+	db, err := database.DbConnect()
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer db.Close()
+
+	//getting commodity by product id
+	rows, err := db.Query("SELECT * FROM commodities WHERE id_product = ?", productId)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer rows.Close()
+
+	var commodities []Commodity
+	for rows.Next() {
+		var commodity Commodity
+		err := rows.Scan(&commodity.Id_product, &commodity.Id_raw_material, &commodity.Quantity)
+		if err != nil {
+			fmt.Println(err)
+		}
+		commodities = append(commodities, commodity)
+	}
+	json.NewEncoder(w).Encode(commodities)
+}

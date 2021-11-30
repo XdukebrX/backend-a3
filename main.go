@@ -31,8 +31,9 @@ func main() {
 	router.HandleFunc("/listproducts/{name}", server.GetProductByName).Methods("GET")
 	//get raw material by name
 	router.HandleFunc("/listmaterials/{name}", server.GetRawMaterialByName).Methods("GET")
-	//get commodity by name
-	//router.HandleFunc("/listcommodities/{name}", server.GetCommodityByName).Methods("GET")
+	//get commodity by product id
+	router.HandleFunc("/listcommodities/{id}", server.GetCommodityByProductId).Methods("GET")
+
 	//starting server
 	fmt.Println("Listening on port 8080")
 	log.Fatal(http.ListenAndServe(":8080", router))
