@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/gorilla/mux"
 )
 
 const JSON = "application/json"
@@ -198,4 +200,26 @@ func GetAllCommodities(w http.ResponseWriter, r *http.Request) {
 		commodities = append(commodities, commodity)
 	}
 	json.NewEncoder(w).Encode(commodities)
+}
+
+//get product by name via url
+func GetProductByName(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", JSON)
+	params := mux.Vars(r)
+	productName := params["name"]
+	db, err := database.DbConnect()
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer db.Close()
+
+	productName = productName + "%"
+	//getting product by name
+	row := db.QueryRow("SELECT * FROM products WHERE name LIKE  ? ", productName)
+	var product Product
+	err = row.Scan(&product.Id, &product.Name, &product.Value)
+	if err != nil {
+		fmt.Println(err)
+	}
+	json.NewEncoder(w).Encode(product)
 }
