@@ -29,7 +29,7 @@ type RawMaterial struct {
 //struct commodities  Id_product Id_raw_material quantity
 type Commodity struct {
 	Id_product      uint32 `json:"id_product"`
-	Id_raw_material string `json:"id_raw_material"`
+	Id_raw_material uint32 `json:"id_raw_material"`
 	Quantity        uint32 `json:"quantity"`
 }
 
@@ -274,4 +274,112 @@ func GetCommodityByProductId(w http.ResponseWriter, r *http.Request) {
 		commodities = append(commodities, commodity)
 	}
 	json.NewEncoder(w).Encode(commodities)
+}
+
+//put product
+func UpdateProduct(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", JSON)
+	params := mux.Vars(r)
+	productId := params["id"]
+	db, err := database.DbConnect()
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer db.Close()
+
+	//getting product by id
+	row := db.QueryRow("SELECT * FROM products WHERE id = ? ", productId)
+	var product Product
+	err = row.Scan(&product.Id, &product.Name, &product.Value)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	//decoding json
+	decoder := json.NewDecoder(r.Body)
+	var updatedProduct Product
+	err = decoder.Decode(&updatedProduct)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	//updating product
+	_, err = db.Exec("UPDATE products SET name = ?, value = ? WHERE id_product = ?", updatedProduct.Name, updatedProduct.Value, productId)
+	if err != nil {
+		fmt.Println(err)
+	}
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprintf(w, "Product has been successfully updated")
+}
+
+//put raw material
+func UpdateRawMaterial(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", JSON)
+	params := mux.Vars(r)
+	rawMaterialId := params["id"]
+	db, err := database.DbConnect()
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer db.Close()
+
+	//getting raw material by id
+	row := db.QueryRow("SELECT * FROM raw_materials WHERE id = ? ", rawMaterialId)
+	var rawMaterial RawMaterial
+	err = row.Scan(&rawMaterial.Id, &rawMaterial.Name, &rawMaterial.Stock)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	//decoding json
+	decoder := json.NewDecoder(r.Body)
+	var updatedRawMaterial RawMaterial
+	err = decoder.Decode(&updatedRawMaterial)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	//updating raw material
+	_, err = db.Exec("UPDATE raw_materials SET name = ?, stock = ? WHERE id_raw_material = ?", updatedRawMaterial.Name, updatedRawMaterial.Stock, rawMaterialId)
+	if err != nil {
+		fmt.Println(err)
+	}
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprintf(w, "Raw material has been successfully updated")
+}
+
+//put commodity
+func UpdateCommodity(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", JSON)
+	params := mux.Vars(r)
+	Id_product := params["id"]
+	db, err := database.DbConnect()
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer db.Close()
+
+	//getting commodity by id
+	row := db.QueryRow("SELECT * FROM commodities WHERE id_commodity = ? ", Id_product)
+	var commodity Commodity
+	err = row.Scan(&commodity.Id_product, &commodity.Id_raw_material, &commodity.Quantity)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	//decoding json
+	decoder := json.NewDecoder(r.Body)
+	var updatedCommodity Commodity
+	err = decoder.Decode(&updatedCommodity)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	//updating commodity
+	_, err = db.Exec("UPDATE commodities SET id_raw_material = ?, quantity = ?, id_product =? WHERE id_product = ?", updatedCommodity.Id_raw_material, updatedCommodity.Quantity, updatedCommodity.Id_product, Id_product)
+	if err != nil {
+		fmt.Println(err)
+	}
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprintf(w, "Commodity has been successfully updated")
 }

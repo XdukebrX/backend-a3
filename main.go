@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/rs/cors"
 )
 
 func main() {
@@ -34,8 +35,25 @@ func main() {
 	//get commodity by product id
 	router.HandleFunc("/listcommodities/{id}", server.GetCommodityByProductId).Methods("GET")
 
+	//put product
+	router.HandleFunc("/alterproducts/{id}", server.UpdateProduct).Methods("PUT")
+	//put raw material
+	router.HandleFunc("/altermaterials/{id}", server.UpdateRawMaterial).Methods("PUT")
+	//put commodity
+	router.HandleFunc("/altercommodities/{id}", server.UpdateCommodity).Methods("PUT")
+
 	//starting server
+
+	c := cors.New(cors.Options{
+		AllowedOrigins:   []string{"http://*:3000"},
+		AllowCredentials: true,
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+	})
+
+	handler := c.Handler(router)
+
 	fmt.Println("Listening on port 8080")
-	log.Fatal(http.ListenAndServe(":8080", router))
+	log.Fatal(http.ListenAndServe(":8080", handler))
 
 }
