@@ -383,3 +383,63 @@ func UpdateCommodity(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	fmt.Fprintf(w, "Commodity has been successfully updated")
 }
+
+//delete product
+func DeleteProduct(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", JSON)
+	params := mux.Vars(r)
+	productId := params["id"]
+	db, err := database.DbConnect()
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer db.Close()
+
+	//deleting product
+	_, err = db.Exec("DELETE FROM products WHERE id_product = ?", productId)
+	if err != nil {
+		fmt.Println(err)
+	}
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprintf(w, "Product has been successfully deleted")
+}
+
+//delete raw material
+func DeleteRawMaterial(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", JSON)
+	params := mux.Vars(r)
+	id_product := params["id"]
+	db, err := database.DbConnect()
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer db.Close()
+
+	//deleting raw material
+	_, err = db.Exec("DELETE FROM raw_materials WHERE id_productl = ?", id_product)
+	if err != nil {
+		fmt.Println(err)
+	}
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprintf(w, "Raw material has been successfully deleted")
+}
+
+//delete commodity
+func DeleteCommodity(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", JSON)
+	params := mux.Vars(r)
+	commodityId := params["id"]
+	db, err := database.DbConnect()
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer db.Close()
+
+	//deleting commodity
+	_, err = db.Exec("DELETE FROM commodities WHERE id_commodity = ?", commodityId)
+	if err != nil {
+		fmt.Println(err)
+	}
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprintf(w, "Commodity has been successfully deleted")
+}

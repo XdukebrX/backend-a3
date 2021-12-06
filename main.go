@@ -42,6 +42,13 @@ func main() {
 	//put commodity
 	router.HandleFunc("/altercommodities/{id}", server.UpdateCommodity).Methods("PUT")
 
+	//delete product
+	router.HandleFunc("/deleteproducts/{id}", server.DeleteProduct).Methods("DELETE")
+	//delete raw material
+	router.HandleFunc("/deletematerials/{id}", server.DeleteRawMaterial).Methods("DELETE")
+	//delete commodity
+	router.HandleFunc("/deletecommodities/{id}", server.DeleteCommodity).Methods("DELETE")
+
 	//starting server
 
 	c := cors.New(cors.Options{
