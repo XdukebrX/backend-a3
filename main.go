@@ -47,7 +47,7 @@ func main() {
 	//delete raw material
 	router.HandleFunc("/deletematerials/{id}", server.DeleteRawMaterial).Methods("DELETE")
 	//delete commodity using product id and commodity id via url
-	router.HandleFunc("/deletecommodities/{id}/{id2}", server.DeleteCommodity).Methods("DELETE")
+	router.HandleFunc("/deletecommodities/{id}", server.DeleteCommodity).Methods("DELETE")
 
 	//starting server
 

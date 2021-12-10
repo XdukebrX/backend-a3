@@ -52,7 +52,7 @@ func CreateProduct(w http.ResponseWriter, r *http.Request) {
 	defer db.Close()
 
 	//inserting new product
-	insert, err := db.Query("INSERT INTO products(pname, value) VALUES(?, ?)", product.Name, product.Value)
+	insert, err := db.Query("INSERT INTO products(pname, pvalue) VALUES(?, ?)", product.Name, product.Value)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -107,7 +107,7 @@ func CreateCommodity(w http.ResponseWriter, r *http.Request) {
 
 	//inserting new commodity
 	db.Exec("SET GLOBAL FOREIGN_KEY_CHECKS=0;")
-	insert, err := db.Query("INSERT INTO commodities(id_product, id_raw_material, quantity) VALUES(?, ?, ?)", commodity.Id_product, commodity.Id_raw_material, commodity.Quantity)
+	insert, err := db.Query("INSERT INTO commodities(id_products, id_raw_materials, quantity) VALUES(?, ?, ?)", commodity.Id_product, commodity.Id_raw_material, commodity.Quantity)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -240,7 +240,7 @@ func GetRawMaterialById(w http.ResponseWriter, r *http.Request) {
 	defer db.Close()
 
 	//getting raw material by id
-	row := db.QueryRow("SELECT * FROM raw_materials WHERE idraw_materials = ? ", rawMaterialId)
+	row := db.QueryRow("SELECT * FROM raw_materials WHERE idraw_material = ? ", rawMaterialId)
 	var rawMaterial RawMaterial
 	err = row.Scan(&rawMaterial.Id, &rawMaterial.Name, &rawMaterial.Stock)
 	if err != nil {
@@ -353,7 +353,7 @@ func UpdateProduct(w http.ResponseWriter, r *http.Request) {
 
 	//updating product
 	db.Exec("SET GLOBAL FOREIGN_KEY_CHECKS=0;")
-	_, err = db.Exec("UPDATE products SET pname = ?, value = ? WHERE id_product = ?", updatedProduct.Name, updatedProduct.Value, productId)
+	_, err = db.Exec("UPDATE products SET pname = ?, pvalue = ? WHERE id_product = ?", updatedProduct.Name, updatedProduct.Value, productId)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -372,7 +372,7 @@ func UpdateRawMaterial(w http.ResponseWriter, r *http.Request) {
 	defer db.Close()
 
 	//getting raw material by id
-	row := db.QueryRow("SELECT * FROM raw_materials WHERE idraw_materials = ? ", rawMaterialId)
+	row := db.QueryRow("SELECT * FROM raw_materials WHERE idraw_material = ? ", rawMaterialId)
 	var rawMaterial RawMaterial
 	err = row.Scan(&rawMaterial.Id, &rawMaterial.Name, &rawMaterial.Stock)
 	if err != nil {
@@ -389,7 +389,7 @@ func UpdateRawMaterial(w http.ResponseWriter, r *http.Request) {
 
 	//updating raw material
 	db.Exec("SET GLOBAL FOREIGN_KEY_CHECKS=0;")
-	_, err = db.Exec("UPDATE raw_materials SET rname = ?, stock = ? WHERE idraw_materials = ?", updatedRawMaterial.Name, updatedRawMaterial.Stock, rawMaterialId)
+	_, err = db.Exec("UPDATE raw_materials SET rname = ?, stock = ? WHERE idraw_material = ?", updatedRawMaterial.Name, updatedRawMaterial.Stock, rawMaterialId)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -464,7 +464,7 @@ func DeleteRawMaterial(w http.ResponseWriter, r *http.Request) {
 	defer db.Close()
 
 	//deleting raw material
-	_, err = db.Exec("DELETE FROM raw_materials WHERE idraw_materials = ?", id_product)
+	_, err = db.Exec("DELETE FROM raw_materials WHERE idraw_material = ?", id_product)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -475,8 +475,8 @@ func DeleteRawMaterial(w http.ResponseWriter, r *http.Request) {
 func DeleteCommodity(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", JSON)
 	params := mux.Vars(r)
-	productId := params["id_product"]
-	rawMaterialId := params["id_raw_material"]
+	productId := params["id1"]
+
 	db, err := database.DbConnect()
 	if err != nil {
 		fmt.Println(err)
@@ -484,7 +484,7 @@ func DeleteCommodity(w http.ResponseWriter, r *http.Request) {
 	defer db.Close()
 
 	//deleting commodity
-	_, err = db.Exec("DELETE FROM commodities WHERE id_products = ? AND id_raw_materials = ?", productId, rawMaterialId)
+	_, err = db.Exec("DELETE FROM commodities WHERE id_products = ?", productId)
 	if err != nil {
 		fmt.Println(err)
 	}
